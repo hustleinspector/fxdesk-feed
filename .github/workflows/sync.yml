@@ -1,0 +1,24 @@
+name: Sync FX Desk feed
+on:
+  schedule:
+    - cron: "20 */2 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stahnout feed z VPS
+        run: |
+          curl -fsS --max-time 60 -o feed.json        http://80.211.209.132:8088/fxdesk/feed.json
+          curl -fsS --max-time 60 -o bars_crypto.json http://80.211.209.132:8088/fxdesk/bars_crypto.json
+          curl -fsS --max-time 60 -o bars_daily.json  http://80.211.209.132:8088/fxdesk/bars_daily.json
+      - name: Commit a push (jen pri zmene)
+        run: |
+          git config user.name "fxdesk-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "feed sync"
+          git push

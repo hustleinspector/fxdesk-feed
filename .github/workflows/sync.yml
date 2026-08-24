@@ -1,8 +1,8 @@
 name: Sync FX Desk feed
 on:
   schedule:
-    - cron: "20 */2 * * *"
-  workflow_dispatch: {}
+    - cron: "20 */2 * * *"   # kazde 2 hodiny v :20 (po sberu harvesteru)
+  workflow_dispatch: {}       # + tlacitko pro rucni spusteni
 permissions:
   contents: write
 jobs:
@@ -15,6 +15,7 @@ jobs:
           curl -fsS --max-time 60 -o feed.json        http://80.211.209.132:8088/fxdesk/feed.json
           curl -fsS --max-time 60 -o bars_crypto.json http://80.211.209.132:8088/fxdesk/bars_crypto.json
           curl -fsS --max-time 60 -o bars_daily.json  http://80.211.209.132:8088/fxdesk/bars_daily.json
+          curl -fsS --max-time 60 -o macro.json       http://80.211.209.132:8088/fxdesk/macro.json || true
       - name: Commit a push (jen pri zmene)
         run: |
           git config user.name "fxdesk-bot"
